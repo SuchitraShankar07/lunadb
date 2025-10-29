@@ -1,4 +1,5 @@
 DROP DATABASE IF EXISTS lunadb;
+CREATE DATABASE lunadb;
 
 use lunadb;
 
