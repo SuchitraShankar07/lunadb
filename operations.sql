@@ -17,7 +17,7 @@ DETERMINISTIC
 BEGIN
     DECLARE user_part VARCHAR(100);
     DECLARE domain_part VARCHAR(100);
-    SELECT username, domain INTO user_part, domain_part
+        SELECT email_name, email_domain INTO user_part, domain_part
     FROM Email
     WHERE researcher_id = rid
     LIMIT 1;
@@ -69,10 +69,8 @@ CREATE TRIGGER LogObservationUpdate
 BEFORE UPDATE ON Observation_data
 FOR EACH ROW
 BEGIN
-    IF OLD.value <> NEW.value THEN
-        INSERT INTO Observation_Log (observation_id, object_id, old_value, new_value)
-        VALUES (OLD.observation_id, OLD.object_id, OLD.value, NEW.value);
-    END IF;
+    -- Observation logging removed. Previously this trigger inserted into Observation_Log,
+    -- but the project schema uses Observation_data only. Keep trigger empty or add other logic here if needed.
 END$$
 
 DELIMITER ;
@@ -119,7 +117,7 @@ BEGIN
     INSERT INTO Full_name (researcher_id, first_name, last_name)
     VALUES (rid, fname, lname);
 
-    INSERT INTO Email (email_id, researcher_id, username, domain)
+    INSERT INTO Email (email_id, researcher_id, email_name, email_domain)
     VALUES (rid + 100, rid, email_user, email_dom);
 END$$
 
