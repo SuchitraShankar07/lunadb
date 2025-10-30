@@ -168,12 +168,30 @@ def run_query(conn, query, params=None, fetch=True):
     try:
         cur = conn.cursor()
         cur.execute(query, params or ())
+        
         if fetch:
             cols = [c[0] for c in cur.description] if cur.description else []
             rows = cur.fetchall()
             df = pd.DataFrame(rows, columns=cols) if rows and cols else pd.DataFrame(rows)
+            
+            # For stored procedures, consume additional result sets
+            if query.strip().upper().startswith('CALL'):
+                try:
+                    while cur.nextset():
+                        pass
+                except Exception:
+                    pass
+            
             return df
         else:
+            # For stored procedures, consume all result sets
+            if query.strip().upper().startswith('CALL'):
+                try:
+                    while cur.nextset():
+                        pass
+                except Exception:
+                    pass
+            
             conn.commit()
             return None
     except Error as e:
@@ -189,13 +207,27 @@ def safe_call(conn, query, params=None):
     try:
         cur = conn.cursor()
         cur.execute(query, params or ())
-        # attempt to fetch results (for procedures that SELECT)
+        
+        # For stored procedures, try to fetch results if available
+        df = None
         try:
-            cols = [c[0] for c in cur.description] if cur.description else []
-            rows = cur.fetchall()
-            df = pd.DataFrame(rows, columns=cols) if rows and cols else pd.DataFrame(rows)
+            # Check if there are results to fetch
+            if cur.description:
+                cols = [c[0] for c in cur.description]
+                rows = cur.fetchall()
+                if rows and cols:
+                    df = pd.DataFrame(rows, columns=cols)
         except Exception:
+            # Some procedures don't return results
             df = None
+        
+        # Consume any additional result sets
+        try:
+            while cur.nextset():
+                pass
+        except Exception:
+            pass
+            
         conn.commit()
         return df
     except Error as e:
@@ -370,32 +402,6 @@ with tabs[1]:
                     st.error(f"Procedure error: {e}")
 
     st.markdown("---")
-    st.subheader("RegisterResearcher")
-    with st.form(key="register_researcher"):
-        nrid = st.number_input("researcher_id", min_value=1, value=301)
-        fname = st.text_input("First name", value="First")
-        lname = st.text_input("Last name", value="Last")
-        affil = st.text_input("Affiliation", value="Affiliation")
-        dob = st.date_input("Date of birth", value=date(1990, 1, 1))
-        email_user = st.text_input("Email username", value="user.name")
-        email_dom = st.text_input("Email domain", value="example.com")
-        submit2 = st.form_submit_button("Call RegisterResearcher")
-        if submit2:
-            try:
-                safe_call(conn, "CALL RegisterResearcher(%s,%s,%s,%s,%s,%s,%s)", (int(nrid), fname, lname, affil, dob, email_user, email_dom))
-                st.success("RegisterResearcher executed. New researcher inserted.")
-                st.dataframe(run_query(conn, "SELECT * FROM Researchers WHERE researcher_id = %s", (int(nrid),)))
-                st.dataframe(run_query(conn, "SELECT * FROM Full_name WHERE researcher_id = %s", (int(nrid),)))
-                # attempt to show email row if present
-                try:
-                    dfem = run_query(conn, "SELECT * FROM Email WHERE researcher_id = %s", (int(nrid),))
-                    st.dataframe(dfem)
-                except Exception:
-                    st.info("Email row not found or column names differ - see notes.")
-            except Error as e:
-                st.error(f"Procedure error: {e}")
-
-    st.markdown("---")
     st.subheader("GetObjectReport")
     with st.form(key="get_object_report"):
         obj = st.selectbox("object_id", options=["-- none --"] + [str(o) for o in objects])
@@ -431,7 +437,7 @@ with tabs[2]:
                 st.error(f"Insert error (trigger may have blocked it): {e}")
 
     st.markdown("---")
-    st.subheader("Delete a mission (may be blocked by PreventMissionDelete)")
+    st.subheader("Delete a mission (SHOULD be blocked by PreventMissionDelete if mission has existing discoveries)")
     with st.form(key="delete_mission"):
         del_mid = st.selectbox("Mission id to delete", options=["-- none --"] + [str(m) for m in missions])
         del_submit = st.form_submit_button("Delete mission")
@@ -446,30 +452,6 @@ with tabs[2]:
                     st.error(f"Delete blocked or error: {e}")
 
     st.markdown("---")
-    st.subheader("Update Observation value (fires LogObservationUpdate)")
-    with st.form(key="update_obs"):
-        obs_id = st.number_input("observation_id", min_value=1, value=501)
-        obj_id = st.selectbox("object_id for observation", options=["-- none --"] + [str(o) for o in objects], index=0)
-        delta = st.number_input("Delta to add to value", value=1.0)
-        upd_submit = st.form_submit_button("Update observation")
-        if upd_submit:
-            if obj_id == "-- none --":
-                st.error("Select object id")
-            else:
-                try:
-                    run_query(conn, "UPDATE Observation_data SET value = value + %s WHERE observation_id = %s AND object_id = %s", (delta, int(obs_id), int(obj_id)), fetch=False)
-                    st.success("Observation updated.")
-                    try:
-                        # show the updated observation row instead of Observation_Log
-                        df = run_query(conn, "SELECT * FROM Observation_data WHERE observation_id = %s AND object_id = %s", (int(obs_id), int(obj_id)))
-                        if df is not None and not df.empty:
-                            st.dataframe(df)
-                        else:
-                            st.info("Observation updated but no matching row was found to display.")
-                    except Exception as e:
-                        st.info(f"Could not fetch updated observation: {e}")
-                except Error as e:
-                    st.error(f"Update error: {e}")
 
 with tabs[3]:
     st.header("Raw SQL executor")

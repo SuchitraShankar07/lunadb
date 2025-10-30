@@ -65,13 +65,6 @@ BEGIN
     END IF;
 END$$
 
-CREATE TRIGGER LogObservationUpdate
-BEFORE UPDATE ON Observation_data
-FOR EACH ROW
-BEGIN
-    -- Observation logging removed. Previously this trigger inserted into Observation_Log,
-    -- but the project schema uses Observation_data only. Keep trigger empty or add other logic here if needed.
-END$$
 
 DELIMITER ;
 
@@ -99,26 +92,6 @@ BEGIN
         INSERT INTO Discoveries (discovery_id, mission_id, object_id, researcher_id, discovery_date)
         VALUES (d_id, m_id, o_id, r_id, d_date);
     END IF;
-END$$
-
-CREATE PROCEDURE RegisterResearcher(
-    IN rid INT,
-    IN fname VARCHAR(50),
-    IN lname VARCHAR(50),
-    IN affil VARCHAR(100),
-    IN dob DATE,
-    IN email_user VARCHAR(100),
-    IN email_dom VARCHAR(100)
-)
-BEGIN
-    INSERT INTO Researchers (researcher_id, full_name, affiliation, date_of_birth)
-    VALUES (rid, CONCAT('Dr. ', fname, ' ', lname), affil, dob);
-
-    INSERT INTO Full_name (researcher_id, first_name, last_name)
-    VALUES (rid, fname, lname);
-
-    INSERT INTO Email (email_id, researcher_id, email_name, email_domain)
-    VALUES (rid + 100, rid, email_user, email_dom);
 END$$
 
 CREATE PROCEDURE GetObjectReport(IN objid INT)
