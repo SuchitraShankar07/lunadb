@@ -1,3 +1,5 @@
+use lunadb;
+
 DROP FUNCTION IF EXISTS GetMissionDurationYears;
 DROP FUNCTION IF EXISTS GetResearcherEmail;
 DROP FUNCTION IF EXISTS DiscoveryCountByResearcher;
@@ -39,7 +41,6 @@ DELIMITER ;
 
 DROP TRIGGER IF EXISTS SplitFullName;
 DROP TRIGGER IF EXISTS PreventMissionDelete;
-DROP TRIGGER IF EXISTS LogObservationUpdate;
 
 DELIMITER $$
 
@@ -47,13 +48,17 @@ CREATE TRIGGER SplitFullName
 AFTER INSERT ON Researchers
 FOR EACH ROW
 BEGIN
+    DECLARE cleaned_name VARCHAR(255);
+    SET cleaned_name = REPLACE(REPLACE(NEW.full_name, 'Dr. ', ''), 'Prof. ', '');
+
     INSERT INTO Full_name (researcher_id, first_name, last_name)
     VALUES (
         NEW.researcher_id,
-        SUBSTRING_INDEX(REPLACE(NEW.full_name, 'Dr. ', ''), ' ', 1),
-        SUBSTRING_INDEX(REPLACE(NEW.full_name, 'Dr. ', ''), ' ', -1)
+        SUBSTRING_INDEX(cleaned_name, ' ', 1),
+        SUBSTRING_INDEX(cleaned_name, ' ', -1)
     );
 END$$
+
 
 CREATE TRIGGER PreventMissionDelete
 BEFORE DELETE ON Missions
@@ -69,7 +74,6 @@ END$$
 DELIMITER ;
 
 DROP PROCEDURE IF EXISTS AddDiscovery;
-DROP PROCEDURE IF EXISTS RegisterResearcher;
 DROP PROCEDURE IF EXISTS GetObjectReport;
 
 DELIMITER $$

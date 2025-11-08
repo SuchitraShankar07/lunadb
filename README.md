@@ -30,6 +30,13 @@ mysql -u <user> -p lunadb < insert.sql
 mysql -u <user> -p lunadb < operations.sql
 ```
 
+Alternatively run to setup/reset the database:
+
+```
+chmod +x reset.sh 
+./reset.sh
+```
+
 If you prefer, run the three files inside a MySQL client session (use `SOURCE create.sql; SOURCE insert.sql; SOURCE operations.sql;`).
 
 Notes about schema mismatches
