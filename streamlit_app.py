@@ -11,141 +11,148 @@ st.set_page_config(page_title="LunaDB - Functional UI", layout="wide")
 st.markdown(
     """
     <style>
+    /* Import cosmic fonts */
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&family=Space+Grotesk:wght@300;400;600&display=swap');
+
+    :root {
+        --font-primary: 'Space Grotesk', sans-serif;
+        --font-heading: 'Orbitron', sans-serif;
+    }
+
+    /* Base App container and background */
     [data-testid="stAppViewContainer"] {
         background-image: url('https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExcG9kZ2NnbGVkNGRuYnBzemtrd2sydzExcWF4MmYyb3F3enVqa3RqbSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/FlodpfQUBSp20/giphy.gif');
         background-size: cover;
-        image-rendering: -webkit-optimize-contrast;
-        image-rendering: crisp-edges;
         background-position: center;
-        background-repeat: repeat;
         background-attachment: fixed;
     }
     [data-testid="stAppViewContainer"]::before {
         content: "";
         position: fixed;
         inset: 0;
-        background: rgba(0, 0, 0, 0.7);
+        background: rgba(0, 0, 20, 0.75);
         z-index: -1;
-        pointer-events: none;
     }
-    
-    /* Dark theme global styles */
-    .stApp {
-        color: #e8e8e8;
+
+    /* Font styling — cosmic aesthetic */
+    body, .stApp, .stMarkdown, label, input, textarea, select, div, button {
+        font-family: var(--font-primary) !important;
+        letter-spacing: 0.3px;
     }
-    
-    /* Headers */
+
     h1, h2, h3, h4, h5, h6 {
-        color: #ffffff !important;
+        font-family: var(--font-heading) !important;
+        color: #e0e8ff !important;
+        text-shadow: 0 0 10px rgba(100, 180, 255, 0.5);
     }
-    
-    /* All text inputs, text areas, and number inputs */
-    input, textarea, [data-baseweb="select"] {
-        background-color: rgba(30, 30, 30, 0.8) !important;
-        color: #ffffff !important;
-        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+
+    /* Headings with neon glow */
+    h1 {
+        font-size: 2.6rem !important;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        background: linear-gradient(90deg, #8ab4f8, #a855f7, #3b82f6);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        text-shadow: 0 0 20px rgba(100, 180, 255, 0.4);
     }
-    
-    /* Date inputs */
-    [data-baseweb="input"] input {
-        background-color: rgba(30, 30, 30, 0.8) !important;
-        color: #ffffff !important;
+
+    h2, h3 {
+        text-shadow: 0 0 12px rgba(100, 180, 255, 0.3);
     }
-    
-    /* Dropdowns/select boxes */
-    [data-baseweb="select"] > div {
-        background-color: rgba(30, 30, 30, 0.8) !important;
-        color: #ffffff !important;
-    }
-    
-    /* Buttons */
-    .stButton > button {
-        background: linear-gradient(90deg, #1e3a8a, #3b82f6) !important;
-        color: #ffffff !important;
+
+    /* Button styling */
+    .stButton > button, .stFormSubmitButton > button {
+        background: linear-gradient(90deg, #1e3a8a, #3b82f6, #9333ea) !important;
+        border-radius: 8px !important;
         border: none !important;
-        border-radius: 6px !important;
+        color: #f0f8ff !important;
+        font-weight: 600;
+        text-transform: uppercase;
+        box-shadow: 0 0 12px rgba(59, 130, 246, 0.6);
+        transition: all 0.3s ease-in-out;
+        font-family: var(--font-heading) !important;
     }
-    
-    .stButton > button:hover {
-        background: linear-gradient(90deg, #1e40af, #2563eb) !important;
+    .stButton > button:hover, .stFormSubmitButton > button:hover {
+        background: linear-gradient(90deg, #3b82f6, #6366f1, #ec4899) !important;
+        box-shadow: 0 0 20px rgba(147, 51, 234, 0.7);
+        transform: scale(1.03);
     }
-    
-    /* Form submit buttons */
-    .stFormSubmitButton > button {
-        background: linear-gradient(90deg, #1e3a8a, #3b82f6) !important;
-        color: #ffffff !important;
-        border: none !important;
-    }
-    
-    /* Dataframes */
-    [data-testid="stDataFrame"] {
-        background-color: rgba(20, 20, 20, 0.9) !important;
-    }
-    
+
+    /* DataFrames and tables */
     [data-testid="stDataFrame"] table {
-        color: #ffffff !important;
+        font-family: var(--font-primary) !important;
+        color: #e0e0ff !important;
+        background-color: rgba(10, 10, 30, 0.8) !important;
+        border-radius: 8px !important;
+        border: 1px solid rgba(255, 255, 255, 0.05);
     }
-    
     [data-testid="stDataFrame"] th {
-        background-color: rgba(30, 58, 138, 0.8) !important;
-        color: #ffffff !important;
+        background-color: rgba(60, 60, 100, 0.8) !important;
+        text-transform: uppercase;
+        font-weight: 600;
     }
-    
-    [data-testid="stDataFrame"] td {
-        background-color: rgba(30, 30, 30, 0.8) !important;
-        color: #e8e8e8 !important;
-    }
-    
-    /* Tabs */
+
+    /* Tabs with glowing edge */
     .stTabs [data-baseweb="tab-list"] {
-        background-color: rgba(20, 20, 20, 0.6);
+        background-color: rgba(20, 20, 40, 0.6);
+        border-radius: 10px;
     }
-    
     .stTabs [data-baseweb="tab"] {
-        color: #a0a0a0 !important;
-        background-color: transparent;
+        font-family: var(--font-heading) !important;
+        color: #b0b0ff !important;
     }
-    
     .stTabs [aria-selected="true"] {
-        color: #ffffff !important;
-        background-color: rgba(59, 130, 246, 0.3) !important;
-    }
-    
-    /* Success/Error/Warning/Info boxes */
-    .stSuccess, .stError, .stWarning, .stInfo {
-        background-color: rgba(20, 20, 20, 0.8) !important;
+        background-color: rgba(100, 100, 255, 0.25) !important;
+        border-bottom: 2px solid #a855f7 !important;
         color: #ffffff !important;
     }
-    
-    /* Expanders */
-    [data-testid="stExpander"] {
-        background-color: rgba(30, 30, 30, 0.6) !important;
-        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+
+    /* Inputs */
+    input, textarea, [data-baseweb="select"] {
+        background-color: rgba(25, 25, 50, 0.85) !important;
+        color: #ffffff !important;
+        border: 1px solid rgba(147, 51, 234, 0.3) !important;
+        border-radius: 6px !important;
+        font-family: var(--font-primary) !important;
     }
-    
-    /* Sidebar dark theme */
+    input:focus, textarea:focus {
+        outline: none !important;
+        box-shadow: 0 0 10px rgba(147, 51, 234, 0.6);
+    }
+
+    /* Sidebar cosmic look */
     [data-testid="stSidebar"] {
-        background: rgba(10, 10, 10, 0.85) !important;
+        background: radial-gradient(circle at top left, rgba(20,20,40,0.95), rgba(10,10,20,0.85)) !important;
+        border-right: 1px solid rgba(100,100,255,0.15);
     }
-    
     [data-testid="stSidebar"] * {
-        color: #e8e8e8 !important;
+        color: #e0e8ff !important;
+        font-family: var(--font-heading) !important;
     }
-    
-    /* Labels and small text */
-    label, .stMarkdown p {
-        color: #d0d0d0 !important;
+
+    /* Links and hover effects */
+    a {
+        color: #a855f7 !important;
+        text-decoration: none;
     }
-    
-    /* Horizontal rules */
-    hr {
-        border-color: rgba(255, 255, 255, 0.1) !important;
+    a:hover {
+        color: #f472b6 !important;
     }
-    
+
+    /* Info / Success / Warning boxes */
+    .stSuccess, .stError, .stWarning, .stInfo {
+        font-family: var(--font-primary) !important;
+        border-radius: 10px !important;
+        background: rgba(15, 15, 40, 0.8) !important;
+        color: #e8e8ff !important;
+        box-shadow: 0 0 12px rgba(100, 180, 255, 0.2);
+    }
     </style>
     """,
     unsafe_allow_html=True
 )
+
 
 
 def connect_db(host, port, user, password, database):
