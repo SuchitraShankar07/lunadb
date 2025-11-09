@@ -61,12 +61,11 @@ CREATE TABLE Full_name (
 );
 
 CREATE TABLE Discoveries (
-    discovery_id INT,
+    discovery_id INT PRIMARY KEY,
     mission_id INT,
     object_id INT,
     researcher_id INT,
     discovery_date DATE, 
-    PRIMARY KEY (discovery_id, mission_id, object_id, researcher_id)
     FOREIGN KEY (mission_id)
         REFERENCES Missions(mission_id)
         ON DELETE CASCADE
@@ -80,4 +79,3 @@ CREATE TABLE Discoveries (
         ON DELETE CASCADE
         ON UPDATE CASCADE
 );
-

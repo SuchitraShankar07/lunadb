@@ -5,147 +5,154 @@ from datetime import date
 import pandas as pd
 
 
-st.set_page_config(page_title="LunaDB UI", layout="wide")
+st.set_page_config(page_title="LunaDB - Functional UI", layout="wide")
 
 # Inject full-page background GIF
 st.markdown(
     """
     <style>
+    /* Import cosmic fonts */
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&family=Space+Grotesk:wght@300;400;600&display=swap');
+
+    :root {
+        --font-primary: 'Space Grotesk', sans-serif;
+        --font-heading: 'Orbitron', sans-serif;
+    }
+
+    /* Base App container and background */
     [data-testid="stAppViewContainer"] {
         background-image: url('https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExcG9kZ2NnbGVkNGRuYnBzemtrd2sydzExcWF4MmYyb3F3enVqa3RqbSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/FlodpfQUBSp20/giphy.gif');
         background-size: cover;
-        image-rendering: -webkit-optimize-contrast;
-        image-rendering: crisp-edges;
         background-position: center;
-        background-repeat: repeat;
         background-attachment: fixed;
     }
     [data-testid="stAppViewContainer"]::before {
         content: "";
         position: fixed;
         inset: 0;
-        background: rgba(0, 0, 0, 0.7);
+        background: rgba(0, 0, 20, 0.75);
         z-index: -1;
-        pointer-events: none;
     }
-    
-    /* Dark theme global styles */
-    .stApp {
-        color: #e8e8e8;
+
+    /* Font styling — cosmic aesthetic */
+    body, .stApp, .stMarkdown, label, input, textarea, select, div, button {
+        font-family: var(--font-primary) !important;
+        letter-spacing: 0.3px;
     }
-    
-    /* Headers */
+
     h1, h2, h3, h4, h5, h6 {
-        color: #ffffff !important;
+        font-family: var(--font-heading) !important;
+        color: #e0e8ff !important;
+        text-shadow: 0 0 10px rgba(100, 180, 255, 0.5);
     }
-    
-    /* All text inputs, text areas, and number inputs */
-    input, textarea, [data-baseweb="select"] {
-        background-color: rgba(30, 30, 30, 0.8) !important;
-        color: #ffffff !important;
-        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+
+    /* Headings with neon glow */
+    h1 {
+        font-size: 2.6rem !important;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        background: linear-gradient(90deg, #8ab4f8, #a855f7, #3b82f6);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        text-shadow: 0 0 20px rgba(100, 180, 255, 0.4);
     }
-    
-    /* Date inputs */
-    [data-baseweb="input"] input {
-        background-color: rgba(30, 30, 30, 0.8) !important;
-        color: #ffffff !important;
+
+    h2, h3 {
+        text-shadow: 0 0 12px rgba(100, 180, 255, 0.3);
     }
-    
-    /* Dropdowns/select boxes */
-    [data-baseweb="select"] > div {
-        background-color: rgba(30, 30, 30, 0.8) !important;
-        color: #ffffff !important;
-    }
-    
-    /* Buttons */
-    .stButton > button {
-        background: linear-gradient(90deg, #1e3a8a, #3b82f6) !important;
-        color: #ffffff !important;
+
+    /* Button styling */
+    .stButton > button, .stFormSubmitButton > button {
+        background: linear-gradient(90deg, #1e3a8a, #3b82f6, #9333ea) !important;
+        border-radius: 8px !important;
         border: none !important;
-        border-radius: 6px !important;
+        color: #f0f8ff !important;
+        font-weight: 600;
+        text-transform: uppercase;
+        box-shadow: 0 0 12px rgba(59, 130, 246, 0.6);
+        transition: all 0.3s ease-in-out;
+        font-family: var(--font-heading) !important;
     }
-    
-    .stButton > button:hover {
-        background: linear-gradient(90deg, #1e40af, #2563eb) !important;
+    .stButton > button:hover, .stFormSubmitButton > button:hover {
+        background: linear-gradient(90deg, #3b82f6, #6366f1, #ec4899) !important;
+        box-shadow: 0 0 20px rgba(147, 51, 234, 0.7);
+        transform: scale(1.03);
     }
-    
-    /* Form submit buttons */
-    .stFormSubmitButton > button {
-        background: linear-gradient(90deg, #1e3a8a, #3b82f6) !important;
-        color: #ffffff !important;
-        border: none !important;
-    }
-    
-    /* Dataframes */
-    [data-testid="stDataFrame"] {
-        background-color: rgba(20, 20, 20, 0.9) !important;
-    }
-    
+
+    /* DataFrames and tables */
     [data-testid="stDataFrame"] table {
-        color: #ffffff !important;
+        font-family: var(--font-primary) !important;
+        color: #e0e0ff !important;
+        background-color: rgba(10, 10, 30, 0.8) !important;
+        border-radius: 8px !important;
+        border: 1px solid rgba(255, 255, 255, 0.05);
     }
-    
     [data-testid="stDataFrame"] th {
-        background-color: rgba(30, 58, 138, 0.8) !important;
-        color: #ffffff !important;
+        background-color: rgba(60, 60, 100, 0.8) !important;
+        text-transform: uppercase;
+        font-weight: 600;
     }
-    
-    [data-testid="stDataFrame"] td {
-        background-color: rgba(30, 30, 30, 0.8) !important;
-        color: #e8e8e8 !important;
-    }
-    
-    /* Tabs */
+
+    /* Tabs with glowing edge */
     .stTabs [data-baseweb="tab-list"] {
-        background-color: rgba(20, 20, 20, 0.6);
+        background-color: rgba(20, 20, 40, 0.6);
+        border-radius: 10px;
     }
-    
     .stTabs [data-baseweb="tab"] {
-        color: #a0a0a0 !important;
-        background-color: transparent;
+        font-family: var(--font-heading) !important;
+        color: #b0b0ff !important;
     }
-    
     .stTabs [aria-selected="true"] {
-        color: #ffffff !important;
-        background-color: rgba(59, 130, 246, 0.3) !important;
-    }
-    
-    /* Success/Error/Warning/Info boxes */
-    .stSuccess, .stError, .stWarning, .stInfo {
-        background-color: rgba(20, 20, 20, 0.8) !important;
+        background-color: rgba(100, 100, 255, 0.25) !important;
+        border-bottom: 2px solid #a855f7 !important;
         color: #ffffff !important;
     }
-    
-    /* Expanders */
-    [data-testid="stExpander"] {
-        background-color: rgba(30, 30, 30, 0.6) !important;
-        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+
+    /* Inputs */
+    input, textarea, [data-baseweb="select"] {
+        background-color: rgba(25, 25, 50, 0.85) !important;
+        color: #ffffff !important;
+        border: 1px solid rgba(147, 51, 234, 0.3) !important;
+        border-radius: 6px !important;
+        font-family: var(--font-primary) !important;
     }
-    
-    /* Sidebar dark theme */
+    input:focus, textarea:focus {
+        outline: none !important;
+        box-shadow: 0 0 10px rgba(147, 51, 234, 0.6);
+    }
+
+    /* Sidebar cosmic look */
     [data-testid="stSidebar"] {
-        background: rgba(10, 10, 10, 0.85) !important;
+        background: radial-gradient(circle at top left, rgba(20,20,40,0.95), rgba(10,10,20,0.85)) !important;
+        border-right: 1px solid rgba(100,100,255,0.15);
     }
-    
     [data-testid="stSidebar"] * {
-        color: #e8e8e8 !important;
+        color: #e0e8ff !important;
+        font-family: var(--font-heading) !important;
     }
-    
-    /* Labels and small text */
-    label, .stMarkdown p {
-        color: #d0d0d0 !important;
+
+    /* Links and hover effects */
+    a {
+        color: #a855f7 !important;
+        text-decoration: none;
     }
-    
-    /* Horizontal rules */
-    hr {
-        border-color: rgba(255, 255, 255, 0.1) !important;
+    a:hover {
+        color: #f472b6 !important;
     }
-    
+
+    /* Info / Success / Warning boxes */
+    .stSuccess, .stError, .stWarning, .stInfo {
+        font-family: var(--font-primary) !important;
+        border-radius: 10px !important;
+        background: rgba(15, 15, 40, 0.8) !important;
+        color: #e8e8ff !important;
+        box-shadow: 0 0 12px rgba(100, 180, 255, 0.2);
+    }
     </style>
     """,
     unsafe_allow_html=True
 )
+
 
 
 def connect_db(host, port, user, password, database):
@@ -251,220 +258,338 @@ def load_small_list(conn, query):
 
 st.title("LunaDB")
 
-with st.sidebar:
-    # sidebar CSS to style the connection form
-    st.markdown(
-        """
-        <style>
-        /* Sidebar container tweaks */
-        [data-testid="stSidebar"] .css-1d391kg {padding-top: 8px;
-        background-color: rgba(0,0,0,0.5) !important;
-        }
-        /* Style inputs and text areas in the sidebar */
-        [data-testid="stSidebar"] input, [data-testid="stSidebar"] textarea {
-            background: rgba(255,255,255,0.04) !important;
-            color: #fff !important;
-            border-radius: 6px !important;
-            padding: 8px !important;
-        }
-        /* Style the submit button in the sidebar form */
-        [data-testid="stSidebar"] .stButton>button {
-            background: linear-gradient(90deg,#246bce,#1f4fb4) !important;
-            color: #fff !important;
-            border: none !important;
-            border-radius: 8px !important;
-            padding: 8px 12px !important;
-        }
-        /* Small helper text */
-        [data-testid="stSidebar"] .small-muted {font-size:12px;color:#cbd5e1;margin-top:4px;}
-        </style>
-        """,
-        unsafe_allow_html=True,
-    )
-
-    # Header + helper block using simple HTML for better layout
-    st.markdown(
-        """
-        <div style="padding:10px 6px;border-radius:8px;margin-bottom:8px;">
-            <h3 style="margin:0 0 4px 0;color:#fff;">DB connection</h3>
-           
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-    with st.form(key="conn_form"):
-        host = st.text_input("Host", value="localhost")
-        port = st.text_input("Port", value="3306")
-        user = st.text_input("User", value="root")
-        password = st.text_input("Password", type="password")
-        database = st.text_input("Database", value="lunadb")
-        conn_btn = st.form_submit_button("Connect")
+# Auto-connect using fixed credentials and provide simple sidebar navigation
+DEFAULT_DB = {"host": "localhost", "port": "3306", "user": "root", "password": "tejas123", "database": "lunadb"}
 
 if "conn" not in st.session_state:
     st.session_state.conn = None
+    st.session_state.conn_error = None
 
-if conn_btn:
-    conn = connect_db(host, port, user, password, database)
-    if conn:
-        st.session_state.conn = conn
-        st.success("Connected to DB")
+if st.session_state.conn is None:
+    _conn = connect_db(
+        DEFAULT_DB["host"], DEFAULT_DB["port"], DEFAULT_DB["user"], DEFAULT_DB["password"], DEFAULT_DB["database"]
+    )
+    if _conn:
+        st.session_state.conn = _conn
+    else:
+        st.error("Automatic database connection failed. Check MySQL is running and credentials are valid.")
+        st.stop()
 
-conn = st.session_state.get("conn")
+conn = st.session_state.conn
 
-if not conn:
-    st.warning("Please connect to your MySQL database using the sidebar before using the UI.")
-    st.stop()
+with st.sidebar:
+    st.title("LunaDB")
+    st.caption("Connected as root (auto-login)")
+    page = st.radio("Navigate", ["Home", "Missions", "Researchers", "Objects", "Discoveries", "Advanced"], index=0)
 
 
 ### Load reference data for selection controls
-missions = load_small_list(conn, "SELECT mission_id FROM Missions ORDER BY mission_id LIMIT 100")
-researchers = load_small_list(conn, "SELECT researcher_id FROM Researchers ORDER BY researcher_id LIMIT 200")
-objects = load_small_list(conn, "SELECT object_id FROM Celestial_objects ORDER BY object_id LIMIT 200")
+missions = load_small_list(conn, "SELECT mission_id FROM Missions ORDER BY mission_id LIMIT 200")
+researchers = load_small_list(conn, "SELECT researcher_id FROM Researchers ORDER BY researcher_id LIMIT 500")
+objects = load_small_list(conn, "SELECT object_id FROM Celestial_objects ORDER BY object_id LIMIT 500")
 
 
-tabs = st.tabs(["Functions", "Procedures", "Trigger-actions", "Raw SQL"])
-
-with tabs[0]:
-    st.header("Functions")
-    st.subheader("GetMissionDurationYears")
-    col1, col2 = st.columns(2)
-    with col1:
-        mission_choice = st.selectbox("Select mission (optional)", options=["-- none --"] + [str(m) for m in missions])
-        launch_date = None
-        if mission_choice != "-- none --":
+# Helper to show dataframes nicely
+def show_df(df):
+    if df is None or df.empty:
+        st.info("No rows to display.")
+    else:
+        try:
+            st.dataframe(df, use_container_width=True, hide_index=True)
+        except TypeError:
             try:
-                dfm = run_query(conn, "SELECT launch_date FROM Missions WHERE mission_id = %s", (int(mission_choice),))
-                if not dfm.empty:
-                    launch_date = dfm.iloc[0, 0]
+                st.dataframe(df.style.hide(axis="index"), use_container_width=True)
             except Exception:
-                launch_date = None
-        if not launch_date:
-            launch_date = st.date_input("Or pick a launch date", value=date(2000, 1, 1))
-    with col2:
-        if st.button("Compute mission age in years"):
-            try:
-                # MySQL function call
-                df = run_query(conn, "SELECT GetMissionDurationYears(%s) AS years", (launch_date,))
-                st.write(df)
-            except Error as e:
-                st.error(f"Database error: {e}")
+                st.dataframe(df, use_container_width=True)
+
+
+# Pages
+if page == "Home":
+    st.header("Welcome to LunaDB")
+    st.write("Use the sidebar to navigate through the main features of this app.")
+    st.markdown(
+        """
+        - Missions: Browse missions, view details and discovery counts, compute durations, and manage deletions.
+        - Researchers: Browse researchers, view details and email, and add new researchers.
+        - Objects: Browse celestial objects, get object reports, and view observations.
+        - Discoveries: List discoveries with rich joins and add new discovery records.
+        - Advanced: Run raw SQL queries (use with care).
+        """
+    )
+
+elif page == "Missions":
+    st.header("Missions")
+    # Browse actions stacked vertically
+    list_btn = st.button("List first 100 missions", use_container_width=True)
+    list_container = st.container()
+    if list_btn:
+        try:
+            df = run_query(conn, "SELECT mission_id, Name AS mission_name, launch_date, agency FROM Missions ORDER BY mission_id LIMIT 100")
+            with list_container:
+                show_df(df)
+        except Error as e:
+            st.error(f"Error: {e}")
+
+    mid = st.selectbox("Select mission id", options=["-- none --"] + [str(m) for m in missions])
+    details_container = st.container()
+
+    if mid != "-- none --":
+        try:
+            df = run_query(
+                conn,
+                """
+                SELECT m.mission_id, m.Name AS mission_name, m.launch_date, m.agency,
+                       COUNT(d.discovery_id) AS discovery_count
+                FROM Missions m
+                LEFT JOIN Discoveries d ON m.mission_id = d.mission_id
+                WHERE m.mission_id = %s
+                GROUP BY m.mission_id
+                """,
+                (int(mid),),
+            )
+            with details_container:
+                show_df(df)
+        except Error as e:
+            st.error(f"Error: {e}")
 
     st.markdown("---")
-    st.subheader("GetResearcherEmail")
-    rcol1, rcol2 = st.columns([1, 2])
-    with rcol1:
-        rid = st.selectbox("Researcher ID", options=["-- none --"] + [str(r) for r in researchers])
-    with rcol2:
-        if st.button("Get email for researcher"):
-            if rid == "-- none --":
-                st.error("Select a researcher id first")
+    st.subheader("Utilities")
+    # Only keep the specific-date utility and ensure the output appears directly below
+    with st.expander("Compute years from a specific date", expanded=False):
+        with st.form("mission_years_from_date"):
+            ld = st.date_input("Launch date", value=date(2000, 1, 1))
+            sub = st.form_submit_button("Compute years", use_container_width=True)
+        util_result_container = st.container()
+        if sub:
+            try:
+                df = run_query(conn, "SELECT GetMissionDurationYears(%s) AS years", (ld,))
+                with util_result_container:
+                    show_df(df)
+            except Error as e:
+                st.error(f"Error: {e}")
+
+    st.markdown("---")
+    st.subheader("Delete mission")
+    with st.form("delete_mission_form"):
+        del_mid = st.selectbox("Mission id", options=["-- none --"] + [str(m) for m in missions], key="del_m")
+        confirm = st.checkbox("I understand this may be blocked")
+        submit = st.form_submit_button("Delete mission", use_container_width=True)
+        if submit:
+            if del_mid == "-- none --":
+                st.error("Pick a mission id")
+            elif not confirm:
+                st.error("Please confirm intent")
             else:
                 try:
-                    df = run_query(conn, "SELECT GetResearcherEmail(%s) AS email", (int(rid),))
-                    st.write(df)
+                    run_query(conn, "DELETE FROM Missions WHERE mission_id = %s", (int(del_mid),), fetch=False)
+                    st.success("Delete attempted. Check DB.")
                 except Error as e:
-                    st.error(f"Database error: {e}")
+                    st.error(f"Delete error: {e}")
+
+elif page == "Researchers":
+    st.header("Researchers")
+    list_r_container = st.container()
+    if st.button("List first 200 researchers", use_container_width=True):
+        try:
+            df = run_query(conn, "SELECT * FROM Researchers ORDER BY researcher_id LIMIT 200")
+            with list_r_container:
+                show_df(df)
+        except Error as e:
+            st.error(f"Error: {e}")
 
     st.markdown("---")
-    st.subheader("DiscoveryCountByResearcher")
-    did = st.selectbox("Researcher for discovery count", options=["-- none --"] + [str(r) for r in researchers], key="disc_r")
-    if st.button("Get discovery count"):
-        if did == "-- none --":
-            st.error("Select a researcher id first")
+    st.subheader("Details")
+    rid = st.selectbox("Researcher id", options=["-- none --"] + [str(r) for r in researchers])
+    if rid != "-- none --":
+        try:
+            df = run_query(
+                conn,
+                """
+                SELECT r.*, CONCAT(e.email_name, '@', e.email_domain) AS email
+                FROM Researchers r
+                LEFT JOIN Email e ON r.researcher_id = e.researcher_id
+                WHERE r.researcher_id = %s
+                """,
+                (int(rid),),
+            )
+            show_df(df)
+        except Error as e:
+            st.error(f"Error: {e}")
+
+    st.markdown("---")
+    st.subheader("Lookup email")
+    email_container = st.container()
+    with st.form("get_email_form"):
+        rid_email = st.selectbox("Researcher", options=["-- none --"] + [str(r) for r in researchers], key="rid_email")
+        sub = st.form_submit_button("Get email", use_container_width=True)
+        if sub:
+            if rid_email == "-- none --":
+                st.error("Select id")
+            else:
+                try:
+                    df = run_query(conn, "SELECT GetResearcherEmail(%s) AS email", (int(rid_email),))
+                    with email_container:
+                        show_df(df)
+                except Error as e:
+                    st.error(f"Error: {e}")
+
+    st.markdown("---")
+    st.subheader("Add researcher")
+    insert_r_container = st.container()
+    with st.form("insert_researcher_form"):
+        irid = st.number_input("researcher_id", min_value=1, value=600)
+        ifname = st.text_input("Full name", value="Dr. Test User")
+        iaff = st.text_input("Affiliation", value="TestOrg")
+        idob = st.date_input("Date of birth", value=date(1990, 1, 1))
+        submit = st.form_submit_button("Insert", use_container_width=True)
+        if submit:
+            try:
+                run_query(
+                    conn,
+                    "INSERT INTO Researchers (researcher_id, full_name, affiliation, date_of_birth) VALUES (%s,%s,%s,%s)",
+                    (int(irid), ifname, iaff, idob),
+                    fetch=False,
+                )
+                st.success("Inserted researcher.")
+                with insert_r_container:
+                    show_df(run_query(conn, "SELECT * FROM Full_name WHERE researcher_id = %s", (int(irid),)))
+            except Error as e:
+                st.error(f"Insert error: {e}")
+
+elif page == "Objects":
+    st.header("Celestial Objects & Observations")
+    list_o_container = st.container()
+    if st.button("List first 200 objects", use_container_width=True):
+        try:
+            df = run_query(conn, "SELECT * FROM Celestial_objects ORDER BY object_id LIMIT 200")
+            with list_o_container:
+                show_df(df)
+        except Error as e:
+            st.error(f"Error: {e}")
+
+    st.markdown("---")
+    st.subheader("Object report")
+    obj_report_container = st.container()
+    with st.form("object_report_form"):
+        obj = st.selectbox("object_id", options=["-- none --"] + [str(o) for o in objects])
+        submit = st.form_submit_button("Get report", use_container_width=True)
+        if submit:
+            if obj == "-- none --":
+                st.error("Select an object")
+            else:
+                try:
+                    df = safe_call(conn, "CALL GetObjectReport(%s)", (int(obj),))
+                    if df is not None and not df.empty:
+                        with obj_report_container:
+                            show_df(df)
+                    else:
+                        st.info("No rows returned or not parseable.")
+                except Error as e:
+                    st.error(f"Procedure error: {e}")
+
+    st.markdown("---")
+    st.subheader("Observations for object")
+    oid = st.selectbox("Choose object", options=["-- none --"] + [str(o) for o in objects], key="obs_obj")
+    obs_container = st.container()
+    if st.button("Show observations", use_container_width=True):
+        if oid == "-- none --":
+            st.error("Select an object")
         else:
             try:
-                df = run_query(conn, "SELECT DiscoveryCountByResearcher(%s) AS total_discoveries", (int(did),))
-                st.write(df)
+                df = run_query(
+                    conn,
+                    """
+                    SELECT od.observation_id, od.object_id, co.name AS object_name, od.parameter, od.value
+                    FROM Observation_data od
+                    LEFT JOIN Celestial_objects co ON od.object_id = co.object_id
+                    WHERE od.object_id = %s
+                    ORDER BY od.observation_id DESC
+                    LIMIT 200
+                    """,
+                    (int(oid),),
+                )
+                with obs_container:
+                    show_df(df)
             except Error as e:
-                st.error(f"Database error: {e}")
+                st.error(f"Error: {e}")
 
-with tabs[1]:
-    st.header("Stored Procedures")
-    st.subheader("AddDiscovery")
-    with st.form(key="add_discovery"):
+elif page == "Discoveries":
+    st.header("Discoveries")
+    list_d_container = st.container()
+    if st.button("List recent discoveries", use_container_width=True):
+        try:
+            df = run_query(
+                conn,
+                """
+                SELECT d.discovery_id, d.discovery_date, d.mission_id, m.Name AS mission_name,
+                       d.object_id, co.name AS object_name, d.researcher_id, r.full_name
+                FROM Discoveries d
+                LEFT JOIN Missions m ON d.mission_id = m.mission_id
+                LEFT JOIN Celestial_objects co ON d.object_id = co.object_id
+                LEFT JOIN Researchers r ON d.researcher_id = r.researcher_id
+                ORDER BY d.discovery_date DESC
+                LIMIT 200
+                """,
+            )
+            with list_d_container:
+                show_df(df)
+        except Error as e:
+            st.error(f"Error: {e}")
+
+    st.markdown("---")
+    st.subheader("Add discovery")
+    add_disc_container = st.container()
+    with st.form("add_discovery_form"):
         d_id = st.number_input("discovery_id", min_value=1, value=500)
         m_id = st.selectbox("mission_id", options=["-- none --"] + [str(m) for m in missions])
         o_id = st.selectbox("object_id", options=["-- none --"] + [str(o) for o in objects])
         r_id = st.selectbox("researcher_id", options=["-- none --"] + [str(r) for r in researchers])
         d_date = st.date_input("discovery_date", value=date.today())
-        submit = st.form_submit_button("Call AddDiscovery")
+        submit = st.form_submit_button("Insert", use_container_width=True)
         if submit:
             if "-- none --" in (m_id, o_id, r_id):
                 st.error("Select mission, object and researcher IDs")
             else:
                 try:
                     safe_call(conn, "CALL AddDiscovery(%s,%s,%s,%s,%s)", (int(d_id), int(m_id), int(o_id), int(r_id), d_date))
-                    st.success("AddDiscovery executed. Check Discoveries table for new row.")
-                    df = run_query(conn, "SELECT * FROM Discoveries WHERE discovery_id = %s", (int(d_id),))
-                    st.dataframe(df)
+                    st.success("Discovery added (procedure executed).")
+                    with add_disc_container:
+                        show_df(run_query(conn, "SELECT * FROM Discoveries WHERE discovery_id = %s", (int(d_id),)))
                 except Error as e:
                     st.error(f"Procedure error: {e}")
 
     st.markdown("---")
-    st.subheader("GetObjectReport")
-    with st.form(key="get_object_report"):
-        obj = st.selectbox("object_id", options=["-- none --"] + [str(o) for o in objects])
-        submit3 = st.form_submit_button("Call GetObjectReport")
-        if submit3:
-            if obj == "-- none --":
-                st.error("Select an object id")
+    st.subheader("Discovery count by researcher")
+    disc_count_container = st.container()
+    with st.form("disc_count_form"):
+        did = st.selectbox("Researcher", options=["-- none --"] + [str(r) for r in researchers], key="disc_by_r")
+        sub = st.form_submit_button("Get count", use_container_width=True)
+        if sub:
+            if did == "-- none --":
+                st.error("Select id")
             else:
                 try:
-                    df = safe_call(conn, "CALL GetObjectReport(%s)", (int(obj),))
-                    if df is not None and not df.empty:
-                        st.dataframe(df)
+                    df = run_query(conn, "SELECT DiscoveryCountByResearcher(%s) AS total_discoveries", (int(did),))
+                    with disc_count_container:
+                        show_df(df)
+                except Error as e:
+                    st.error(f"Error: {e}")
+
+elif page == "Advanced":
+    st.header("Advanced")
+    with st.expander("Raw SQL executor", expanded=True):
+        st.markdown("Use with care. Queries will run against the connected DB.")
+        with st.form("raw_sql_form"):
+            sql = st.text_area("SQL", value="SELECT * FROM Missions LIMIT 10", height=180)
+            run = st.form_submit_button("Run", use_container_width=True)
+            if run:
+                try:
+                    if sql.strip().lower().startswith("select"):
+                        df = run_query(conn, sql)
+                        show_df(df)
                     else:
-                        st.info("Procedure executed. No rows returned or result could not be parsed.")
+                        run_query(conn, sql, fetch=False)
+                        st.success("Statement executed.")
                 except Error as e:
-                    st.error(f"Procedure error: {e}")
-
-with tabs[2]:
-    st.header("Trigger-causing actions")
-    st.subheader("Insert a researcher (fires SplitFullName)")
-    with st.form(key="insert_researcher"):
-        irid = st.number_input("researcher_id", min_value=1, value=600)
-        ifname = st.text_input("Full name (include title if desired)", value="Dr. Test User")
-        iaff = st.text_input("Affiliation", value="TestOrg")
-        idob = st.date_input("Date of birth", value=date(1990, 1, 1))
-        sub_ir = st.form_submit_button("Insert researcher")
-        if sub_ir:
-            try:
-                run_query(conn, "INSERT INTO Researchers (researcher_id, full_name, affiliation, date_of_birth) VALUES (%s,%s,%s,%s)", (int(irid), ifname, iaff, idob), fetch=False)
-                st.success("Inserted researcher; SplitFullName trigger should have populated Full_name.")
-                st.dataframe(run_query(conn, "SELECT * FROM Full_name WHERE researcher_id = %s", (int(irid),)))
-            except Error as e:
-                st.error(f"Insert error (trigger may have blocked it): {e}")
-
-    st.markdown("---")
-    st.subheader("Delete a mission (SHOULD be blocked by PreventMissionDelete if mission has existing discoveries)")
-    with st.form(key="delete_mission"):
-        del_mid = st.selectbox("Mission id to delete", options=["-- none --"] + [str(m) for m in missions])
-        del_submit = st.form_submit_button("Delete mission")
-        if del_submit:
-            if del_mid == "-- none --":
-                st.error("Select a mission id")
-            else:
-                try:
-                    run_query(conn, "DELETE FROM Missions WHERE mission_id = %s", (int(del_mid),), fetch=False)
-                    st.success("Mission deleted (or deletion executed).")
-                except Error as e:
-                    st.error(f"Delete blocked or error: {e}")
-
-    st.markdown("---")
-
-with tabs[3]:
-    st.header("Raw SQL executor")
-    st.markdown("Use this with care. Any query you run will be executed against the connected database.")
-    sql = st.text_area("SQL", value="SELECT * FROM Missions LIMIT 10")
-    if st.button("Run SQL"):
-        try:
-            if sql.strip().lower().startswith("select"):
-                df = run_query(conn, sql)
-                st.dataframe(df)
-            else:
-                run_query(conn, sql, fetch=False)
-                st.success("Statement executed.")
-        except Error as e:
-            st.error(f"SQL error: {e}")
+                    st.error(f"SQL error: {e}")
 
