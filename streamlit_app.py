@@ -574,9 +574,59 @@ elif page == "Discoveries":
                         show_df(df)
                 except Error as e:
                     st.error(f"Error: {e}")
-
 elif page == "Advanced":
     st.header("Advanced")
+
+    st.markdown("---")
+    st.subheader("Aggregate Function Utilities")
+
+    with st.expander("Total number of missions"):
+        try:
+            df = run_query(conn, "SELECT COUNT(*) AS total_missions FROM Missions")
+            show_df(df)
+        except Error as e:
+            st.error(f"Error: {e}")
+
+    with st.expander("Total number of researchers"):
+        try:
+            df = run_query(conn, "SELECT COUNT(*) AS total_researchers FROM Researchers")
+            show_df(df)
+        except Error as e:
+            st.error(f"Error: {e}")
+
+    with st.expander("Average mass of celestial objects"):
+        try:
+            df = run_query(conn, "SELECT AVG(mass) AS average_mass FROM Celestial_objects")
+            show_df(df)
+        except Error as e:
+            st.error(f"Error: {e}")
+
+
+    with st.expander("Maximum distance among celestial objects"):
+        try:
+            df = run_query(conn, "SELECT MAX(distance) AS farthest_distance FROM Celestial_objects")
+            show_df(df)
+        except Error as e:
+            st.error(f"Error: {e}")
+
+    with st.expander("Discoveries count per mission"):
+        try:
+            df = run_query(
+                conn,
+                """
+                SELECT m.mission_id, m.Name AS mission_name,
+                       COUNT(d.discovery_id) AS total_discoveries
+                FROM Missions m
+                LEFT JOIN Discoveries d ON m.mission_id = d.mission_id
+                GROUP BY m.mission_id, m.Name
+                ORDER BY total_discoveries DESC
+                """
+            )
+            show_df(df)
+        except Error as e:
+            st.error(f"Error: {e}")
+
+    st.markdown("---")
     with st.expander("Raw SQL executor", expanded=True):
         st.markdown("Use with care. Queries will run against the connected DB.")
         with st.form("raw_sql_form"):
