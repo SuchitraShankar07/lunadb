@@ -318,7 +318,7 @@ INSERT INTO `Missions` VALUES
 
 INSERT INTO `Celestial_objects` VALUES
 (101, 'Proxima Centauri b', 4.24, 7160, 1.27, 'Exoplanet'),
-(102, 'Halley''s Comet', 0.586, 11, 220000000000000, 'Comet'),
+(102, 'Halley''s Comet', 0.586, 11, 2.2, 'Comet'),
 (103, 'Kepler-22b', 600, 15300, 5.36, 'Exoplanet'),
 (104, 'Betelgeuse', 642.5, 617100000, 20, 'Star'),
 (105, 'Europa', 0.00078, 1560, 0.008, 'Moon'),
@@ -328,7 +328,7 @@ INSERT INTO `Celestial_objects` VALUES
 (109, 'Mercury', 0.00039, 2440, 0.055, 'Planet'),
 (110, 'Venus', 0.00072, 6052, 0.815, 'Planet'),
 (111, 'Mars', 0.00052, 3389, 0.107, 'Planet'),
-(112, 'Ceres', 2.77, 473, 9.39e+20, 'Dwarf Planet'),
+(112, 'Ceres', 2.77, 473, 9.39, 'Dwarf Planet'),
 (113, 'Pluto', 39.5, 1188, 0.0022, 'Dwarf Planet'),
 (114, 'Titan', 1.22, 2575, 0.0225, 'Moon'),
 (115, 'TRAPPIST-1e', 39.6, 5810, 0.62, 'Exoplanet'),
